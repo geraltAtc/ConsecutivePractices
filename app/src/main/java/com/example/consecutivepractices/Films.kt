@@ -7,8 +7,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -24,7 +26,18 @@ fun FilmsScreen(navigation: NavHostController) {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text(text = "Movies", style = MaterialTheme.typography.titleLarge) }
+                title = {
+                    Text(
+                        text = "Movies",
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                    )
+                },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = Color(0xFF1976D2),
+                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                )
             )
         }
     ) { paddingValues ->
@@ -32,8 +45,8 @@ fun FilmsScreen(navigation: NavHostController) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(horizontal = 10.dp, vertical = 5.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             val list = viewModel.loadMovies()
             items(list) { movie ->
@@ -48,37 +61,55 @@ fun MovieCard(movie: Movie, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(5.dp),
-        shape = MaterialTheme.shapes.medium,
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+            .padding(vertical = 8.dp),
+        shape = MaterialTheme.shapes.large,
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFFE3F2FD),
+            contentColor = Color.Black
+        ),
         onClick = onClick
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column(
                 modifier = Modifier.weight(1f),
-                horizontalAlignment = Alignment.CenterHorizontally
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
                     text = movie.name,
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    ),
+                    maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
-                    textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth()
                 )
-                Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = "Premier year: ${movie.premierYear}",
-                    color = Color.Gray,
-                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = Color(0xFF6200EE)
+                    ),
                     modifier = Modifier.fillMaxWidth()
                 )
                 Text(
                     text = "Rating: ${movie.rating.aggregateRating}",
-                    color = Color.Gray,
-                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = Color(0xFF6200EE)
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Text(
+                    text = "Genres: ${movie.genres.joinToString(", ")}",
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = Color(0xFF6200EE)
+                    ),
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -86,8 +117,10 @@ fun MovieCard(movie: Movie, onClick: () -> Unit) {
                 model = movie.posterImageURL,
                 contentDescription = "Poster",
                 modifier = Modifier
-                    .height(120.dp)
-                    .padding(start = 8.dp)
+                    .height(140.dp)
+                    .width(100.dp)
+                    .clip(MaterialTheme.shapes.large),
+                contentScale = ContentScale.Crop
             )
         }
     }

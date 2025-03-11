@@ -9,9 +9,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import org.koin.androidx.compose.koinViewModel
@@ -36,15 +39,30 @@ private fun MovieDetails(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { movie?.name?.let { Text(text = it) } },
+                title = {
+                    movie?.name?.let {
+                        Text(
+                            text = it,
+                            style = MaterialTheme.typography.titleLarge.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        )
+                    }
+                },
                 navigationIcon = {
                     IconButton(onClick = onBackPressed) {
                         Icon(
                             Icons.AutoMirrored.Rounded.ArrowBack,
-                            contentDescription = "Назад"
+                            contentDescription = "Назад",
+                            tint = MaterialTheme.colorScheme.onSurface
                         )
                     }
-                }
+                },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = Color(0xFF1976D2),
+                    titleContentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             )
         }
     ) { paddingValues ->
@@ -53,8 +71,8 @@ private fun MovieDetails(
                 modifier = Modifier
                     .padding(paddingValues)
                     .fillMaxSize()
-                    .padding(top = 16.dp, bottom = 116.dp, start = 16.dp, end = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 item {
                     AsyncImage(
@@ -62,7 +80,8 @@ private fun MovieDetails(
                         contentDescription = "Poster ${it.name}",
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(400.dp),
+                            .height(300.dp)
+                            .clip(MaterialTheme.shapes.large),
                         contentScale = ContentScale.Crop
                     )
                 }
@@ -70,29 +89,43 @@ private fun MovieDetails(
                 item {
                     Text(
                         text = it.plot,
-                        style = MaterialTheme.typography.bodyLarge
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f)
+                        ),
+                        lineHeight = 24.sp
                     )
                 }
 
                 item {
-                    Column {
+                    Column(
+                        modifier = Modifier.padding(vertical = 8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
                         Text(
                             text = "Premier year: ${it.premierYear}",
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.Bold
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
                         )
                         Text(
                             text = "Rating: ${it.rating.aggregateRating}",
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.Bold
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
                         )
                         Text(
                             text = "Genres: ${it.genres.joinToString(", ")}",
-                            style = MaterialTheme.typography.bodyMedium
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                            )
                         )
                         Text(
                             text = "Countries: ${it.countries.joinToString(", ")}",
-                            style = MaterialTheme.typography.bodyMedium
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                            )
                         )
                     }
                 }
@@ -100,13 +133,18 @@ private fun MovieDetails(
                 item {
                     Text(
                         text = "Cast:",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        ),
+                        modifier = Modifier.padding(vertical = 8.dp)
                     )
                 }
                 items(it.people) { person ->
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         AsyncImage(
@@ -114,12 +152,24 @@ private fun MovieDetails(
                             contentDescription = "Photo ${person.name}",
                             modifier = Modifier
                                 .size(80.dp)
-                                .padding(end = 8.dp),
+                                .padding(end = 8.dp)
+                                .clip(MaterialTheme.shapes.large),
                             contentScale = ContentScale.Crop
                         )
                         Column {
-                            Text(text = person.name, fontWeight = FontWeight.Bold)
-                            Text(text = "Role: ${person.characters.joinToString(", ")}")
+                            Text(
+                                text = person.name,
+                                style = MaterialTheme.typography.bodyMedium.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                            )
+                            Text(
+                                text = "Role: ${person.characters.joinToString(", ")}",
+                                style = MaterialTheme.typography.bodyMedium.copy(
+                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                                )
+                            )
                         }
                     }
                 }

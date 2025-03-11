@@ -8,6 +8,6 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun ProfileScreen() {
-    Text("Профиль",
+    Text("Empty...(",
         modifier = Modifier.padding(top = 400.dp, start = 175.dp))
 }
