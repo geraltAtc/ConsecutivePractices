@@ -1,9 +1,5 @@
 package com.example.consecutivepractices
 
-import com.example.consecutivepractices.Movie
-import com.example.consecutivepractices.Actor
-import com.example.consecutivepractices.Rating
-
 object MoviesData {
     val movies = listOf(
         Movie(
