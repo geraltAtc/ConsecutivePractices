@@ -2,6 +2,7 @@ package com.example.consecutivepractices
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
@@ -10,7 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -25,7 +25,7 @@ fun FilmDetailsScreen(navController: NavHostController, movieId: Int) {
     val viewModel = koinViewModel<DetailsViewModel> { parametersOf(navController, movieId) }
 
     MovieDetails(
-        movie = viewModel.mutableState.movie,
+        movie = viewModel.viewState.movie,
         onBackPressed = { viewModel.back() }
     )
 }
@@ -38,142 +38,135 @@ private fun MovieDetails(
 ) {
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    movie?.name?.let {
-                        Text(
-                            text = it,
-                            style = MaterialTheme.typography.titleLarge.copy(
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                        )
-                    }
-                },
+            TopAppBar(
+                title = { Text(text = movie?.name.orEmpty()) },
                 navigationIcon = {
                     IconButton(onClick = onBackPressed) {
-                        Icon(
-                            Icons.AutoMirrored.Rounded.ArrowBack,
-                            contentDescription = "Назад",
-                            tint = MaterialTheme.colorScheme.onSurface
-                        )
+                        Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Назад")
                     }
-                },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color(0xFF1976D2),
-                    titleContentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                }
             )
         }
     ) { paddingValues ->
-        movie?.let {
-            LazyColumn(
-                modifier = Modifier
-                    .padding(paddingValues)
-                    .fillMaxSize()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                item {
+        if (movie == null) {
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text(text = "Фильм не найден", fontSize = 18.sp)
+            }
+            return@Scaffold
+        }
+
+        LazyColumn(
+            modifier = Modifier
+                .padding(paddingValues)
+                .padding(16.dp)
+        ) {
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
                     AsyncImage(
-                        model = it.posterImageURL,
-                        contentDescription = "Poster ${it.name}",
+                        model = movie.posterImageURL,
+                        contentDescription = "Постер",
                         modifier = Modifier
-                            .fillMaxWidth()
                             .height(300.dp)
-                            .clip(MaterialTheme.shapes.large),
+                            .width(200.dp)
+                            .clip(MaterialTheme.shapes.medium),
                         contentScale = ContentScale.Crop
                     )
-                }
-
-                item {
-                    Text(
-                        text = it.plot,
-                        style = MaterialTheme.typography.bodyLarge.copy(
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f)
-                        ),
-                        lineHeight = 24.sp
-                    )
-                }
-
-                item {
                     Column(
-                        modifier = Modifier.padding(vertical = 8.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .weight(1f)
+                            .padding(end = 8.dp)
                     ) {
                         Text(
-                            text = "Premier year: ${it.premierYear}",
-                            style = MaterialTheme.typography.bodyMedium.copy(
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary
-                            )
+                            text = "Описание:",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp
                         )
                         Text(
-                            text = "Rating: ${it.rating.aggregateRating}",
-                            style = MaterialTheme.typography.bodyMedium.copy(
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        )
-                        Text(
-                            text = "Genres: ${it.genres.joinToString(", ")}",
-                            style = MaterialTheme.typography.bodyMedium.copy(
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
-                            )
-                        )
-                        Text(
-                            text = "Countries: ${it.countries.joinToString(", ")}",
-                            style = MaterialTheme.typography.bodyMedium.copy(
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
-                            )
+                            text = movie.plot,
+                            fontSize = 14.sp
                         )
                     }
                 }
 
-                item {
-                    Text(
-                        text = "Cast:",
-                        style = MaterialTheme.typography.titleLarge.copy(
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface
-                        ),
-                        modifier = Modifier.padding(vertical = 8.dp)
-                    )
-                }
-                items(it.people) { person ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        AsyncImage(
-                            model = person.photoURL,
-                            contentDescription = "Photo ${person.name}",
-                            modifier = Modifier
-                                .size(80.dp)
-                                .padding(end = 8.dp)
-                                .clip(MaterialTheme.shapes.large),
-                            contentScale = ContentScale.Crop
-                        )
-                        Column {
-                            Text(
-                                text = person.name,
-                                style = MaterialTheme.typography.bodyMedium.copy(
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
+                RatingDisplay(movie.rating)
+
+                Spacer(modifier = Modifier.height(16.dp))
+                InfoSection("Жанры", movie.genres)
+                Spacer(modifier = Modifier.height(12.dp))
+                InfoSection("Страны выхода", movie.countries)
+                Spacer(modifier = Modifier.height(24.dp))
+                Text(text = "Команда:", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+
+                LazyRow(
+                    modifier = Modifier.padding(top = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(movie.people) { person ->
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            AsyncImage(
+                                model = person.photoURL,
+                                contentDescription = "Фото ${person.name}",
+                                modifier = Modifier
+                                    .size(100.dp)
+                                    .clip(MaterialTheme.shapes.small),
+                                contentScale = ContentScale.Crop
                             )
-                            Text(
-                                text = "Role: ${person.characters.joinToString(", ")}",
-                                style = MaterialTheme.typography.bodyMedium.copy(
-                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
-                                )
-                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(text = person.name, fontSize = 12.sp)
+
                         }
                     }
                 }
             }
+            item {
+                Spacer(modifier = Modifier.height(100.dp))
+            }
+        }
+    }
+}
+
+@Composable
+fun RatingDisplay(rating: Rating) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 12.dp),
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+        RatingText("KP", rating.kp.toFloat())
+        RatingText("IMDb", rating.imdb.toFloat())
+        RatingText("Critics", rating.filmCritics.toFloat())
+    }
+}
+
+@Composable
+private fun RatingText(label: String, value: Float) {
+    Text(
+        text = "$label: $value",
+        fontSize = 14.sp
+    )
+}
+
+@Composable
+fun InfoSection(title: String, items: List<String>) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = title,
+            fontWeight = FontWeight.Bold,
+            fontSize = 16.sp
+        )
+        items.forEach { item ->
+            Text(
+                text = item,
+                modifier = Modifier.padding(start = 8.dp, top = 2.dp),
+                fontSize = 14.sp
+            )
         }
     }
 }

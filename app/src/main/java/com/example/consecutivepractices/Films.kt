@@ -1,5 +1,7 @@
 package com.example.consecutivepractices
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -7,10 +9,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -18,109 +17,114 @@ import coil.compose.AsyncImage
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
-@OptIn(ExperimentalMaterial3Api::class)
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun FilmsScreen(navigation: NavHostController) {
     val viewModel = koinViewModel<ListViewModel> { parametersOf(navigation) }
+    val state = viewModel.viewState
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        text = "Movies",
-                        style = MaterialTheme.typography.titleLarge.copy(
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                    )
-                },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color(0xFF1976D2),
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                )
+            OutlinedTextField(
+                value = state.query,
+                onValueChange = { viewModel.onQueryChanged(it) },
+                label = { Text("Введите название фильма") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
             )
         }
     ) { paddingValues ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            val list = viewModel.loadMovies()
-            items(list) { movie ->
-                MovieCard(movie, onClick = { viewModel.onItemClicked(movie.id) })
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues)) {
+
+            when {
+                state.isLoading -> {
+                    FullscreenLoading()
+                }
+
+                state.error != null -> {
+                    FullscreenMessage(msg = state.error ?: "")
+                }
+
+                state.isEmpty -> {
+                    FullscreenMessage("По запросу нет результатов")
+                }
+
+                else -> {
+                    val list = viewModel.viewState.items
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 10.dp, vertical = 5.dp),
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        items(list) { movie ->
+                            MovieCard(movie = movie, onClick = { viewModel.onItemClicked(movie.id) })
+                        }
+                    }
+                }
             }
         }
     }
 }
 
 @Composable
-fun MovieCard(movie: Movie, onClick: () -> Unit) {
+fun FullscreenLoading() {
+    Box(
+        Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator()
+    }
+}
+
+@Composable
+fun FullscreenMessage(msg: String) {
+    Box(
+        Modifier
+            .fillMaxSize()
+            .padding(10.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(text = msg)
+    }
+}
+
+@Composable
+fun MovieCard(movie: MovieShort, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        shape = MaterialTheme.shapes.large,
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFE3F2FD),
-            contentColor = Color.Black
-        ),
+            .padding(5.dp),
+        shape = MaterialTheme.shapes.medium,
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         onClick = onClick
     ) {
         Row(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Column(
                 modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
                     text = movie.name,
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface
-                    ),
-                    maxLines = 2,
+                    style = MaterialTheme.typography.titleMedium,
                     overflow = TextOverflow.Ellipsis,
+                    textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth()
                 )
-                Text(
-                    text = "Premier year: ${movie.premierYear}",
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        color = Color(0xFF6200EE)
-                    ),
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Text(
-                    text = "Rating: ${movie.rating.aggregateRating}",
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        color = Color(0xFF6200EE)
-                    ),
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Text(
-                    text = "Genres: ${movie.genres.joinToString(", ")}",
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        color = Color(0xFF6200EE)
-                    ),
-                    modifier = Modifier.fillMaxWidth()
-                )
+                Spacer(modifier = Modifier.height(4.dp))
             }
             AsyncImage(
                 model = movie.posterImageURL,
-                contentDescription = "Poster",
+                contentDescription = "Постер",
                 modifier = Modifier
-                    .height(140.dp)
-                    .width(100.dp)
-                    .clip(MaterialTheme.shapes.large),
-                contentScale = ContentScale.Crop
+                    .height(120.dp)
+                    .padding(start = 8.dp)
             )
         }
     }

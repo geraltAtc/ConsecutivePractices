@@ -1,6 +1,7 @@
 package com.example.consecutivepractices
 
 class Rating(
-    val aggregateRating: Double,
-    val votesValue: Int
+    val kp: Double,
+    val imdb: Double,
+    val filmCritics: Double,
 )

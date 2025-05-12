@@ -1,6 +1,8 @@
 package com.example.consecutivepractices
 
 import android.annotation.SuppressLint
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -23,6 +25,7 @@ import androidx.navigation.compose.rememberNavController
 
 data class NavigationBarItemData(val route: String, val icon: androidx.compose.ui.graphics.vector.ImageVector, val label: String)
 
+@RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun MainActivityScreen() {

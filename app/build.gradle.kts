@@ -14,7 +14,6 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -40,6 +39,9 @@ android {
 }
 
 dependencies {
+    implementation("com.github.pozo:mapstruct-kotlin:1.3.1.1")
+    debugImplementation("com.github.chuckerteam.chucker:library:4.1.0")
+    releaseImplementation("com.github.chuckerteam.chucker:library-no-op:4.1.0")
     // Compose
     implementation(libs.androidx.activity.compose)
     implementation("androidx.activity:activity-compose:1.8.0")
@@ -60,8 +62,7 @@ dependencies {
     // Koin
     implementation("io.insert-koin:koin-core:3.5.0")
     implementation("io.insert-koin:koin-android:3.5.0")
-    // implementation("io.insert-koin:koin-androidx-viewmodel:3.4.0")
-    implementation("io.insert-koin:koin-androidx-compose:3.4.0")
+    implementation("io.insert-koin:koin-androidx-compose:3.5.0")
 
     // Core
     implementation(libs.androidx.core.ktx)
@@ -78,4 +79,12 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    // Retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.9.3")
+
+    // Coroutines
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
 }
