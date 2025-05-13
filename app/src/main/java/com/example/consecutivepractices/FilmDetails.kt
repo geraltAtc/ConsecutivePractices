@@ -17,6 +17,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import com.example.consecutivepractices.model.Movie
+import com.example.consecutivepractices.model.Rating
+import com.example.consecutivepractices.view.DetailsViewModel
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -95,7 +98,12 @@ private fun MovieDetails(
                 RatingDisplay(movie.rating)
 
                 Spacer(modifier = Modifier.height(16.dp))
-                InfoSection("Жанры", movie.genres)
+                movie.genres.forEach { genre ->
+                    Text(
+                        text = genre.displayName,
+                        modifier = Modifier.padding(horizontal = 14.dp)
+                    )
+                }
                 Spacer(modifier = Modifier.height(12.dp))
                 InfoSection("Страны выхода", movie.countries)
                 Spacer(modifier = Modifier.height(24.dp))

@@ -1,6 +1,5 @@
-package com.example.consecutivepractices
+package com.example.consecutivepractices.module
 
-import android.app.VoiceInteractor
 import android.content.Context
 import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.example.consecutivepractices.api.MovieApi

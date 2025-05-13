@@ -10,8 +10,8 @@ import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.rounded.AccountCircle
+import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -31,7 +31,7 @@ data class NavigationBarItemData(val route: String, val icon: androidx.compose.u
 fun MainActivityScreen() {
     val navController = rememberNavController()
     val items = listOf(
-        NavigationBarItemData("films", Icons.AutoMirrored.Filled.List, "Список фильмов"),
+        NavigationBarItemData("favorites", Icons.Rounded.Favorite, "Любимые фильмы"),
         NavigationBarItemData("profile", Icons.Rounded.AccountCircle, "Мой профиль")
     )
 

@@ -1,4 +1,4 @@
-package com.example.consecutivepractices
+package com.example.consecutivepractices.model
 
 class Rating(
     val kp: Double,

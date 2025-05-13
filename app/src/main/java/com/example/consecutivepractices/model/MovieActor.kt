@@ -1,4 +1,4 @@
-package com.example.consecutivepractices
+package com.example.consecutivepractices.model
 
 class Actor (
     val photoURL: String,

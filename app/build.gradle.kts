@@ -2,6 +2,9 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("kotlin-kapt")
+    id("kotlin-parcelize")
+    id("com.google.devtools.ksp") version "2.0.0-RC2-1.0.20"
 }
 
 android {
@@ -40,8 +43,14 @@ android {
 
 dependencies {
     implementation("com.github.pozo:mapstruct-kotlin:1.3.1.1")
+    implementation(libs.androidx.room.runtime.android)
     debugImplementation("com.github.chuckerteam.chucker:library:4.1.0")
     releaseImplementation("com.github.chuckerteam.chucker:library-no-op:4.1.0")
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+    implementation("androidx.room:room-runtime:2.6.1")
+    implementation("androidx.room:room-ktx:2.6.1")
+//    kapt("androidx.room:room-compiler:2.6.1")
+
     // Compose
     implementation(libs.androidx.activity.compose)
     implementation("androidx.activity:activity-compose:1.8.0")
@@ -61,7 +70,7 @@ dependencies {
 
     // Koin
     implementation("io.insert-koin:koin-core:3.5.0")
-    implementation("io.insert-koin:koin-android:3.5.0")
+    implementation("io.insert-koin:koin-android:3.5.3")
     implementation("io.insert-koin:koin-androidx-compose:3.5.0")
 
     // Core

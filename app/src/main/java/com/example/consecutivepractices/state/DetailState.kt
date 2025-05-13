@@ -1,4 +1,7 @@
-package com.example.consecutivepractices
+package com.example.consecutivepractices.state
+
+import com.example.consecutivepractices.model.Movie
+import com.example.consecutivepractices.model.MovieShort
 
 interface MovieDetailState {
     val movie: Movie?

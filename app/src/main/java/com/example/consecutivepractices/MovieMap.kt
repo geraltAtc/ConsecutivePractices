@@ -1,8 +1,14 @@
 package com.example.consecutivepractices
 
+import com.example.consecutivepractices.model.Actor
+import com.example.consecutivepractices.model.Genre
+import com.example.consecutivepractices.model.Movie
+import com.example.consecutivepractices.model.MovieShort
+import com.example.consecutivepractices.model.MovieType
+import com.example.consecutivepractices.model.Rating
 import com.example.consecutivepractices.response.MoviesResponse
 import com.example.consecutivepractices.response.MovieShortResponse
-import com.example.consecutivepractices.response.MoviesSearch
+
 
 class MovieMapper {
     fun toDomain(response: MoviesResponse): Movie {
@@ -14,8 +20,10 @@ class MovieMapper {
             } ?: Rating(0.0, 0.0, 0.0),
             plot = response.description.orEmpty(),
             posterImageURL = response.poster?.url ?: "",
-            genres = response.genres?.mapNotNull { it.name } ?: emptyList(),
-            countries = response.countries?.mapNotNull { it.name } ?: emptyList(),
+            genres = response.genres?.map { genre -> Genre.getGenreByName(genre.name) }
+                ?: emptyList(),
+            countries = response.countries?.map { country -> country.name } ?: emptyList(),
+            type = MovieType.getMovieTypeByCode(response.type),
             people = response.persons
                 ?.filter { it.name != null && it.photoURL != null }
                 ?.map { Actor(it.name!!, it.characters, it.photoURL!!) }
@@ -27,10 +35,13 @@ class MovieMapper {
         return MovieShort(
             id = response.id ?: 0,
             name = response.name.orEmpty(),
-            posterImageURL = response.poster.url ?: ""
+            type = (response.type?.let { MovieType.getMovieTypeByCode(it) } ?: MovieType.MOVIE).toString(),
+            genres = response.genres?.map { Genre.getGenreByName(it.name) } ?: emptyList(),
+            posterImageURL = response.poster?.url ?: ""
         )
     }
 
-    fun toDomainList(response: MoviesSearch) =
-        response.search?.map { movie -> toDomain(movie) }.orEmpty()
+    fun toDomainList(response: List<MovieShortResponse>): List<MovieShort> {
+        return response.map { toDomain(it) }
+    }
 }

@@ -1,13 +1,14 @@
-package com.example.consecutivepractices
+package com.example.consecutivepractices.model
 
 class Movie (
-    val id: Int = 0,
-    val name: String = "",
+    val id: Int,
+    val name: String,
+    val type: MovieType,
     val rating: Rating = Rating(0.0,0.0,0.0),
     val plot: String = "",
     var premierYear: String = "",
     val posterImageURL: String = "",
-    val genres: List<String> = listOf(),
+    val genres: List<Genre> = listOf(),
     val countries: List<String> = listOf(),
     val people: List<Actor> = listOf()
 )
